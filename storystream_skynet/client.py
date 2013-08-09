@@ -1,8 +1,9 @@
+import inspect
 import json
 import urllib
 import urllib2
 from urllib2 import URLError, HTTPError
-from storystream_skynet import SkyNetException
+from storystream_skynet import SkyNetException, StoryNotFoundException
 import storystream_skynet.constants as c
 
 __all__ = ['StoryStreamClient']
@@ -10,7 +11,7 @@ __all__ = ['StoryStreamClient']
 
 class StoryStreamClient(object):
     __ENDPOINT_MAPS = {
-        'blocks': {
+        'get_blocks': {
             'url': 'blocks/published/',
             'allowed_params': ['page', 'rpp', 'since_id']
         },
@@ -30,13 +31,17 @@ class StoryStreamClient(object):
         self.version = version or c.VERSION
         self.timeout = timeout or c.TIMEOUT
 
-    def get_blocks(self):
+    def get_blocks(self, **kwargs):
         """
         Retrieve Content Blocks for a Story
+        Possible kwargs:
         page -- current page of items
         rpp -- number of items to return per page. This is restricted to a maximum of 100 items per page. Default page size is 20
         since_id -- get items published after block with id
         """
+        endpoint = self.__validate_params(**kwargs)
+
+        return self.__request(endpoint['url'], **kwargs)
 
     def search_published(self):
         """
@@ -67,6 +72,7 @@ class StoryStreamClient(object):
 
     def __request(self, endpoint, **params):
         url = self.__build_uri(endpoint) + '?' + urllib.urlencode(params)
+        print 'Making request to ' + url
         req = urllib2.Request(url, headers={'Accept': 'application/json'})
         try:
             response = urllib2.urlopen(req, timeout=self.timeout)
@@ -77,9 +83,29 @@ class StoryStreamClient(object):
             else:
                 return parsed_response
         except HTTPError as e:
+            try:
+                parsed_error = json.loads(e.read())
+                if 'detail' in parsed_error:
+                    if e.code == 404:
+                        e = StoryNotFoundException(parsed_error['detail'])
+                    else:
+                        e = SkyNetException(parsed_error['detail'])
+            except:
+                pass
+
             raise e
         except URLError as e:
             raise e
+
+    def __validate_params(self, **kwargs):
+        called_by = inspect.stack()[1][3]
+        endpoint = self.__ENDPOINT_MAPS[called_by]
+        valid_params = endpoint['allowed_params']
+        invalid_params = list(set(kwargs or {})-set(valid_params))
+        if invalid_params:
+            raise KeyError('%s are invalid parameters for this method' % ', '.join(invalid_params))
+
+        return endpoint
 
     def __build_uri(self, endpoint):
         return 'http://%s/api/v%s/%s%s/' % (self.endpoint, self.version, endpoint, self.story_name)
