@@ -14,5 +14,5 @@ setup(name='StoryStream SkyNet',
       version='0.1',
       author='Bite Studio',
       description='Library for accessing the StoryStream API',
-      packages=['storystream-skynet'],
+      packages=['storystream_skynet'],
       **kw)
