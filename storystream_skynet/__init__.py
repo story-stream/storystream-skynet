@@ -1,10 +1,4 @@
-API_VERSION = 'v2'
-API_ENDPOINT = 'http://54.228.220.23/'
+__author__ = 'Rich @ StoryStream'
 
-
-class StoryNotFoundException(Exception):
-    pass
-
-
-class SkyNetException(Exception):
-    pass
+from .client import StoryStreamClient
+from .exceptions import SkyNetException, StoryNotFoundException

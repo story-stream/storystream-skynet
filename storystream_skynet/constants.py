@@ -1,4 +1,5 @@
-__author__ = 'bite'
+__author__ = 'Rich @ StoryStream'
+
 VERSION = 2
 ENDPOINT = '127.0.0.1:8000'
-TIMEOUT = 2
+TIMEOUT = 3

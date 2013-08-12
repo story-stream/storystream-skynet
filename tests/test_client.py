@@ -1,6 +1,7 @@
 import unittest
 from storystream_skynet.client import StoryStreamClient
-from storystream_skynet import constants, StoryNotFoundException, SkyNetException
+from storystream_skynet import constants
+from storystream_skynet import StoryNotFoundException, SkyNetException
 
 
 class SkyNetClientTestCase(unittest.TestCase):

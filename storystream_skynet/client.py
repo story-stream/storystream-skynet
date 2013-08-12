@@ -1,12 +1,11 @@
+__author__ = 'Rich @ StoryStream'
 import inspect
 import json
 import urllib
 import urllib2
 from urllib2 import URLError, HTTPError
-from storystream_skynet import SkyNetException, StoryNotFoundException
-import storystream_skynet.constants as c
-
-__all__ = ['StoryStreamClient']
+from .exceptions import SkyNetException, StoryNotFoundException
+import constants as c
 
 
 class StoryStreamClient(object):
