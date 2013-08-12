@@ -59,7 +59,7 @@ class SkyNetClientTestCase(unittest.TestCase):
 
         client = StoryStreamClient('storystream', **params)
 
-        since_id = client.get_blocks(rpp=8)['blocks'][4]['content_block_id']
+        since_id = client.get_blocks(rpp=8)['blocks'][4].content_block_id
 
         results = client.get_blocks(since_id=since_id)
         self.assertIsNotNone(results)

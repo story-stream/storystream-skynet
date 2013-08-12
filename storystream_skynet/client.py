@@ -1,3 +1,5 @@
+from storystream_skynet.models import ContentBlock, ContentItem
+
 __author__ = 'Rich @ StoryStream'
 import inspect
 import json
@@ -12,15 +14,18 @@ class StoryStreamClient(object):
     __ENDPOINT_MAPS = {
         'get_blocks': {
             'url': 'blocks/published/',
-            'allowed_params': ['page', 'rpp', 'since_id']
+            'allowed_params': ['page', 'rpp', 'since_id'],
+            'contains_blocks': True
         },
         'search_published': {
             'url': 'search/published/',
-            'allowed_params': ['q', 'page', 'rpp', 'category', 'types', 'order_by', 'all_media', 'tags']
+            'allowed_params': ['q', 'page', 'rpp', 'category', 'types', 'order_by', 'all_media', 'tags'],
+            'contains_blocks': True
         },
         'search_approved': {
             'url': 'search/approved/',
-            'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags']
+            'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags'],
+            'contains_blocks': False
         }
     }
 
@@ -41,7 +46,7 @@ class StoryStreamClient(object):
         """
         endpoint = self.__validate_params(**kwargs)
 
-        return self.__request(endpoint['url'], **kwargs)
+        return self.__request(endpoint, **kwargs)
 
     def search_published(self, q, **kwargs):
         """
@@ -56,7 +61,7 @@ class StoryStreamClient(object):
         """
         endpoint = self.__validate_params(q=q, **kwargs)
 
-        return self.__request(endpoint['url'], q=q, **kwargs)
+        return self.__request(endpoint, q=q, **kwargs)
 
     def search_approved(self, q, **kwargs):
         """
@@ -71,10 +76,10 @@ class StoryStreamClient(object):
         order_by -- property to order items by. Format should be `-FIELDNAME` to search by FIELDNAME in DESCENDING order or `FIELDNAME` for ASCENDING results. (default: -id)
         """
         endpoint = self.__validate_params(q=q, **kwargs)
-        return self.__request(endpoint['url'], q=q, **kwargs)
+        return self.__request(endpoint, q=q, **kwargs)
 
     def __request(self, endpoint, **params):
-        url = self.__build_uri(endpoint) + '?' + urllib.urlencode(params)
+        url = self.__build_uri(endpoint['url']) + '?' + urllib.urlencode(params)
         headers = {'Accept': 'application/json'}
         if self.access_token:
             headers['Authorization'] = 'Bearer %s' % self.access_token
@@ -82,12 +87,7 @@ class StoryStreamClient(object):
         req = urllib2.Request(url, headers=headers)
         try:
             response = urllib2.urlopen(req, timeout=self.timeout)
-            parsed_response = json.loads(response.read())
-
-            if 'detail' in parsed_response:
-                raise SkyNetException('%s %s' % (parsed_response['detail'], url))
-            else:
-                return parsed_response
+            return self.__parse_response(response.read(), endpoint)
         except HTTPError as e:
             try:
                 parsed_error = json.loads(e.read())
@@ -102,6 +102,29 @@ class StoryStreamClient(object):
             raise e
         except URLError as e:
             raise e
+        except Exception as e:
+            raise e
+
+    def __parse_response(self, response, endpoint):
+        parsed_response = json.loads(response)
+
+        if 'detail' in parsed_response:
+            raise SkyNetException('%s %s' % (parsed_response['detail'], endpoint['url']))
+        else:
+            if endpoint['contains_blocks']:
+                klass = ContentBlock
+                key = 'blocks'
+            else:
+                klass = ContentItem
+                key = 'items'
+
+            items_to_parse = []
+            for item in parsed_response[key]:
+                items_to_parse.append(klass(**item))
+
+            parsed_response[key] = items_to_parse
+
+            return parsed_response
 
     def __validate_params(self, **kwargs):
         called_by = inspect.stack()[1][3]
