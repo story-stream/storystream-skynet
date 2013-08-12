@@ -17,7 +17,7 @@ class StoryStreamClient(object):
         },
         'search_published': {
             'url': 'search/published/',
-            'allowed_params': ['q', 'page', 'rpp', 'types', 'order_by', 'all_media', 'tags']
+            'allowed_params': ['q', 'page', 'rpp', 'category', 'types', 'order_by', 'all_media', 'tags']
         },
         'search_approved': {
             'url': 'search/approved/',
@@ -25,11 +25,12 @@ class StoryStreamClient(object):
         }
     }
 
-    def __init__(self, story_name, endpoint=None, version=None, timeout=None):
+    def __init__(self, story_name, access_token=None, endpoint=None, version=None, timeout=None):
         self.story_name = story_name
         self.endpoint = endpoint or c.ENDPOINT
         self.version = version or c.VERSION
         self.timeout = timeout or c.TIMEOUT
+        self.access_token = access_token
 
     def get_blocks(self, **kwargs):
         """
@@ -43,7 +44,7 @@ class StoryStreamClient(object):
 
         return self.__request(endpoint['url'], **kwargs)
 
-    def search_published(self):
+    def search_published(self, q, **kwargs):
         """
         Search  for published Content Blocks for a Story
         q -- term to search by - must be 3 characters or more
@@ -54,9 +55,11 @@ class StoryStreamClient(object):
         rpp -- number of items to return per page. This is restricted to a maximum of 100 items per page. (default: 20)
         order_by -- property to order items by. Format should be `-FIELDNAME` to search by FIELDNAME in DESCENDING order or `FIELDNAME` for ASCENDING results. (default: -publish_date)
         """
-        pass
+        endpoint = self.__validate_params(q=q, **kwargs)
 
-    def search_approved(self):
+        return self.__request(endpoint['url'], q=q, **kwargs)
+
+    def search_approved(self, q, **kwargs):
         """
         Search approved Content Items for a Story
         q -- term to search by - must be 3 characters or more
@@ -68,18 +71,22 @@ class StoryStreamClient(object):
         rpp -- number of items to return per page. This is restricted to a maximum of 100 items per page. (default: 20)
         order_by -- property to order items by. Format should be `-FIELDNAME` to search by FIELDNAME in DESCENDING order or `FIELDNAME` for ASCENDING results. (default: -id)
         """
-        pass
+        endpoint = self.__validate_params(q=q, **kwargs)
+        return self.__request(endpoint['url'], q=q, **kwargs)
 
     def __request(self, endpoint, **params):
         url = self.__build_uri(endpoint) + '?' + urllib.urlencode(params)
-        print 'Making request to ' + url
-        req = urllib2.Request(url, headers={'Accept': 'application/json'})
+        headers = {'Accept': 'application/json'}
+        if self.access_token:
+            headers['Authorization'] = 'Bearer %s' % self.access_token
+
+        req = urllib2.Request(url, headers=headers)
         try:
             response = urllib2.urlopen(req, timeout=self.timeout)
             parsed_response = json.loads(response.read())
 
             if 'detail' in parsed_response:
-                raise SkyNetException(parsed_response['detail'])
+                raise SkyNetException('%s %s' % (parsed_response['detail'], url))
             else:
                 return parsed_response
         except HTTPError as e:
@@ -87,9 +94,9 @@ class StoryStreamClient(object):
                 parsed_error = json.loads(e.read())
                 if 'detail' in parsed_error:
                     if e.code == 404:
-                        e = StoryNotFoundException(parsed_error['detail'])
+                        e = StoryNotFoundException('%s %s' % (parsed_error['detail'], url))
                     else:
-                        e = SkyNetException(parsed_error['detail'])
+                        e = SkyNetException('%s %s' % (parsed_error['detail'], url))
             except:
                 pass
 
