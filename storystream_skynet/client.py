@@ -137,4 +137,4 @@ class StoryStreamClient(object):
         return endpoint
 
     def __build_uri(self, endpoint):
-        return 'http://%s/api/v%s/%s%s/' % (self.endpoint, self.version, endpoint, self.story_name)
+        return 'http://%s/api/v%s/%s%s/' % (self.endpoint, self.version, self.story_name, endpoint)
