@@ -1,3 +1,4 @@
+from datetime import datetime
 import unittest
 from storystream_skynet.client import StoryStreamClient
 from storystream_skynet import constants
@@ -73,6 +74,17 @@ class SkyNetClientTestCase(unittest.TestCase):
         results = client.search_published(q='fos', rpp=5)
         self.assertIsNotNone(results)
         self.assertEqual(len(results['blocks']), 5)
+
+    def test_can_parse_datetimes(self):
+        params = self.default_params
+        params['access_token'] = self.access_token
+
+        client = StoryStreamClient('fos-2013', **params)
+        results = client.search_published(q='fos', rpp=1)
+        self.assertIsNotNone(results)
+        self.assertEqual(len(results['blocks']), 1)
+
+        self.assertEqual(type(results['blocks'][0].content_items[0].publish_date), datetime)
 
     def test_search_for_published_items_with_category(self):
         params = self.default_params

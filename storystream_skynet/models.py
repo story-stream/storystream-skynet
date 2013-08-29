@@ -7,7 +7,7 @@ class ModelBase:
         for k, v in kwargs.iteritems():
             name = k
             value = v
-            if type(v) is str and v.endswith('_date'):
+            if isinstance(v, basestring) and name.endswith('_date'):
                 if k == 'pub_date':
                     name = 'publish_date'
                 try:
@@ -15,8 +15,6 @@ class ModelBase:
                 except:
                     pass
             setattr(self, name, value)
-
-        self.__dict__.update(kwargs)
 
 
 class ContentItem(ModelBase):
