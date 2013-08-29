@@ -1,6 +1,7 @@
-from storystream_skynet.models import ContentBlock, ContentItem
-
 __author__ = 'Rich @ StoryStream'
+
+import re
+from storystream_skynet.models import ContentBlock, ContentItem
 import inspect
 import json
 import urllib
@@ -31,7 +32,7 @@ class StoryStreamClient(object):
 
     def __init__(self, story_name, access_token=None, endpoint=None, version=None, timeout=None):
         self.story_name = story_name
-        self.endpoint = endpoint or c.ENDPOINT
+        self.base_url = endpoint or c.ENDPOINT
         self.version = version or c.VERSION
         self.timeout = timeout or c.TIMEOUT
         self.access_token = access_token
@@ -137,4 +138,5 @@ class StoryStreamClient(object):
         return endpoint
 
     def __build_uri(self, endpoint):
-        return 'http://%s/api/v%s/%s%s/' % (self.endpoint, self.version, self.story_name, endpoint)
+        path = re.sub(r'/{2,}', '/', '/api/v%s/%s/%s/' % (self.version, self.story_name, endpoint))
+        return 'http://%s%s' % (self.base_url, path)
