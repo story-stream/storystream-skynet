@@ -6,10 +6,10 @@ from storystream_skynet import StoryNotFoundException, SkyNetException
 
 
 class SkyNetClientTestCase(unittest.TestCase):
-    access_token = 'a39318c01b705e24a6b61d9fa7e5671ec0e09c20'
+    access_token = '8cd7c4d65c3488e85b6d0bc03722ea64f3258b92'
 
     default_params = {
-        'endpoint': '127.0.0.1:8000',
+        'endpoint': 'storystreamdemo.com',
         'version': 2,
         'timeout': 10
     }

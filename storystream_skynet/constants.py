@@ -1,5 +1,5 @@
 __author__ = 'Rich @ StoryStream'
 
 VERSION = 2
-ENDPOINT = '127.0.0.1:8000'
+ENDPOINT = '54.228.220.23'
 TIMEOUT = 3
