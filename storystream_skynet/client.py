@@ -80,10 +80,11 @@ class StoryStreamClient(object):
         return self.__request(endpoint, q=q, **kwargs)
 
     def __request(self, endpoint, **params):
+        if self.access_token:
+            params['access_token'] = self.access_token
+
         url = self.__build_uri(endpoint['url']) + '?' + urllib.urlencode(params)
         headers = {'Accept': 'application/json'}
-        if self.access_token:
-            headers['Authorization'] = 'Bearer %s' % self.access_token
 
         req = urllib2.Request(url, headers=headers)
         try:
