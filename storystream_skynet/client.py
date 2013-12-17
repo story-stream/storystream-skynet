@@ -27,6 +27,11 @@ class StoryStreamClient(object):
             'url': 'search/approved/',
             'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags'],
             'contains_blocks': False
+        },
+        'search_not_published': {
+            'url': 'search/not-published/',
+            'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags'],
+            'contains_blocks': False
         }
     }
 
@@ -146,6 +151,7 @@ class StoryStreamClient(object):
 
     def __validate_params(self, **kwargs):
         called_by = inspect.stack()[1][3]
+        print called_by
         endpoint = self.__ENDPOINT_MAPS[called_by]
         valid_params = endpoint['allowed_params']
         invalid_params = list(set(kwargs or {})-set(valid_params))

@@ -6,10 +6,10 @@ from storystream_skynet import StoryNotFoundException, SkyNetException
 
 
 class SkyNetClientTestCase(unittest.TestCase):
-    access_token = '8cd7c4d65c3488e85b6d0bc03722ea64f3258b92'
+    access_token = 'c5e761237f8b59fd0684fe4fdb5dc5aceaba7f15'
 
     default_params = {
-        'endpoint': 'storystreamdemo.com',
+        'endpoint': 'localhost:8000',
         'version': 2,
         'timeout': 10
     }
@@ -110,5 +110,23 @@ class SkyNetClientTestCase(unittest.TestCase):
 
         client = StoryStreamClient('fos-2013', **params)
         results = client.search_approved(q='fos', rpp=5)
+        self.assertIsNotNone(results)
+        self.assertTrue(len(results['items']) <= 5)
+
+    def test_search_for_not_published_items(self):
+        params = self.default_params
+        params['access_token'] = self.access_token
+
+        client = StoryStreamClient('storystream-bbq', **params)
+        results = client.search_not_published(q='porsche', rpp=5)
+        self.assertIsNotNone(results)
+        self.assertTrue(len(results['items']) <= 5)
+
+    def test_search_for_not_published_items_with_category(self):
+        params = self.default_params
+        params['access_token'] = self.access_token
+
+        client = StoryStreamClient('storystream-bbq', **params)
+        results = client.search_not_published(q='porsche', rpp=5, categories='music')
         self.assertIsNotNone(results)
         self.assertTrue(len(results['items']) <= 5)
