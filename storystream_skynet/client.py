@@ -151,7 +151,6 @@ class StoryStreamClient(object):
 
     def __validate_params(self, **kwargs):
         called_by = inspect.stack()[1][3]
-        print called_by
         endpoint = self.__ENDPOINT_MAPS[called_by]
         valid_params = endpoint['allowed_params']
         invalid_params = list(set(kwargs or {})-set(valid_params))
