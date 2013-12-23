@@ -112,3 +112,21 @@ class SkyNetClientTestCase(unittest.TestCase):
         results = client.search_approved(q='fos', rpp=5)
         self.assertIsNotNone(results)
         self.assertTrue(len(results['items']) <= 5)
+
+    def test_search_for_not_published_items(self):
+        params = self.default_params
+        params['access_token'] = self.access_token
+
+        client = StoryStreamClient('storystream-bbq', **params)
+        results = client.search_not_published(q='porsche', rpp=5)
+        self.assertIsNotNone(results)
+        self.assertTrue(len(results['items']) <= 5)
+
+    def test_search_for_not_published_items_with_category(self):
+        params = self.default_params
+        params['access_token'] = self.access_token
+
+        client = StoryStreamClient('storystream-bbq', **params)
+        results = client.search_not_published(q='porsche', rpp=5, categories='music')
+        self.assertIsNotNone(results)
+        self.assertTrue(len(results['items']) <= 5)

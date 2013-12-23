@@ -27,6 +27,11 @@ class StoryStreamClient(object):
             'url': 'search/approved/',
             'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags'],
             'contains_blocks': False
+        },
+        'search_not_published': {
+            'url': 'search/not-published/',
+            'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags'],
+            'contains_blocks': False
         }
     }
 
@@ -79,11 +84,28 @@ class StoryStreamClient(object):
         endpoint = self.__validate_params(q=q, **kwargs)
         return self.__request(endpoint, q=q, **kwargs)
 
+    def search_not_published(self, q, **kwargs):
+        """
+        Search not published Content Items for a Story
+        q -- term to search by - must be 3 characters or more
+        Possible kwargs
+        categories -- comma separated list of categories to filter by.
+        tags -- comma separated list of tags to filter by, tags are not inclusive of each other (OR query)
+        types -- comma separated list of feed types to filter by e.g. Youtube, Twitter. Types are not include of each other (OR query)
+        all_media -- true/false value will return all associated images & videos or first just associated image/video. (default: false)
+        rpp -- number of items to return per page. This is restricted to a maximum of 100 items per page. (default: 20)
+        order_by -- property to order items by. Format should be `-FIELDNAME` to search by FIELDNAME in DESCENDING order or `FIELDNAME` for ASCENDING results. (default: -id)
+        """
+        endpoint = self.__validate_params(q=q, **kwargs)
+        return self.__request(endpoint, q=q, **kwargs)
+
+
     def __request(self, endpoint, **params):
+        if self.access_token:
+            params['access_token'] = self.access_token
+
         url = self.__build_uri(endpoint['url']) + '?' + urllib.urlencode(params)
         headers = {'Accept': 'application/json'}
-        if self.access_token:
-            headers['Authorization'] = 'Bearer %s' % self.access_token
 
         req = urllib2.Request(url, headers=headers)
         try:
