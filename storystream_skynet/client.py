@@ -28,8 +28,8 @@ class StoryStreamClient(object):
             'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags'],
             'contains_blocks': False
         },
-        'search_not_published': {
-            'url': 'search/not-published/',
+        'search_all': {
+            'url': 'search/all/',
             'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags'],
             'contains_blocks': False
         }
@@ -84,7 +84,7 @@ class StoryStreamClient(object):
         endpoint = self.__validate_params(q=q, **kwargs)
         return self.__request(endpoint, q=q, **kwargs)
 
-    def search_not_published(self, q, **kwargs):
+    def search_all(self, q, **kwargs):
         """
         Search not published Content Items for a Story
         q -- term to search by - must be 3 characters or more
@@ -98,7 +98,6 @@ class StoryStreamClient(object):
         """
         endpoint = self.__validate_params(q=q, **kwargs)
         return self.__request(endpoint, q=q, **kwargs)
-
 
     def __request(self, endpoint, **params):
         if self.access_token:

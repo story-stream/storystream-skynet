@@ -9,7 +9,7 @@ except ImportError:
 
 
 setup(name='StoryStream SkyNet',
-      version='0.3.7',
+      version='0.3.8',
       author='Bite Studio',
       description='Library for accessing the StoryStream API',
       packages=['storystream_skynet'],
