@@ -48,19 +48,21 @@ class SkyNetClientTestCase(unittest.TestCase):
         params = self.default_params
         params['access_token'] = self.access_token
 
-        client = StoryStreamClient('storystream', **params)
-        results = client.get_blocks(rpp=8)
+        client = StoryStreamClient('storystream-test-sto', **params)
+        results = client.get_blocks(rpp=3)
 
         self.assertIsNotNone(results)
-        self.assertTrue(len(results['blocks']) == 8, msg='%s blocks returned' % len(results['blocks']))
+        self.assertTrue(len(results['blocks']) == 3, msg='%s blocks returned' % len(results['blocks']))
 
     def test_get_items_since(self):
         params = self.default_params
         params['access_token'] = self.access_token
 
-        client = StoryStreamClient('storystream', **params)
+        client = StoryStreamClient('storystream-test-sto', **params)
 
-        since_id = client.get_blocks(rpp=8)['blocks'][4].content_block_id
+        initial_blocks = client.get_blocks(rpp=8)['blocks']
+
+        since_id = initial_blocks[4].content_block_id
 
         results = client.get_blocks(since_id=since_id)
         self.assertIsNotNone(results)
@@ -70,17 +72,17 @@ class SkyNetClientTestCase(unittest.TestCase):
         params = self.default_params
         params['access_token'] = self.access_token
 
-        client = StoryStreamClient('fos-2013', **params)
-        results = client.search_published(q='fos', rpp=5)
+        client = StoryStreamClient('storystream-test-sto', **params)
+        results = client.search_published(q='brighton', rpp=2)
         self.assertIsNotNone(results)
-        self.assertEqual(len(results['blocks']), 5)
+        self.assertEqual(len(results['blocks']), 2)
 
     def test_can_parse_datetimes(self):
         params = self.default_params
         params['access_token'] = self.access_token
 
-        client = StoryStreamClient('fos-2013', **params)
-        results = client.search_published(q='fos', rpp=1)
+        client = StoryStreamClient('storystream-test-sto', **params)
+        results = client.search_published(q='brighton', rpp=1)
         self.assertIsNotNone(results)
         self.assertEqual(len(results['blocks']), 1)
 
@@ -90,17 +92,17 @@ class SkyNetClientTestCase(unittest.TestCase):
         params = self.default_params
         params['access_token'] = self.access_token
 
-        client = StoryStreamClient('fos-2013', **params)
-        results = client.search_published(q='fos', rpp=5, category='gas')
+        client = StoryStreamClient('storystream-test-sto', **params)
+        results = client.search_published(q='brighton', rpp=5, categories='test-category')
         self.assertIsNotNone(results)
-        self.assertEqual(len(results['blocks']), 5)
+        self.assertEqual(len(results['blocks']), 0)
 
     def test_search_for_approved_items_with_category(self):
         params = self.default_params
         params['access_token'] = self.access_token
 
-        client = StoryStreamClient('fos-2013', **params)
-        results = client.search_approved(q='fos', rpp=5, categories='gas')
+        client = StoryStreamClient('storystream-test-sto', **params)
+        results = client.search_approved(q='brighton', rpp=5, categories='gas')
         self.assertIsNotNone(results)
         self.assertTrue(len(results['items']) <= 5)
 
@@ -108,8 +110,8 @@ class SkyNetClientTestCase(unittest.TestCase):
         params = self.default_params
         params['access_token'] = self.access_token
 
-        client = StoryStreamClient('fos-2013', **params)
-        results = client.search_approved(q='fos', rpp=5)
+        client = StoryStreamClient('storystream-test-sto', **params)
+        results = client.search_approved(q='brighton', rpp=5)
         self.assertIsNotNone(results)
         self.assertTrue(len(results['items']) <= 5)
 

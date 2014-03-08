@@ -1,5 +1,5 @@
 __author__ = 'Rich @ StoryStream'
 
-VERSION = 2
-ENDPOINT = '54.228.220.23'
+VERSION = 3
+ENDPOINT = 'live.storystream.it'
 TIMEOUT = 3

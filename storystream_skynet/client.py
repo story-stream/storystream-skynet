@@ -20,17 +20,17 @@ class StoryStreamClient(object):
         },
         'search_published': {
             'url': 'search/published/',
-            'allowed_params': ['q', 'page', 'rpp', 'category', 'types', 'order_by', 'all_media', 'tags'],
+            'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags', 'content_type'],
             'contains_blocks': True
         },
         'search_approved': {
             'url': 'search/approved/',
-            'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags'],
+            'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags', 'content_type'],
             'contains_blocks': False
         },
         'search_all': {
             'url': 'search/all/',
-            'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags'],
+            'allowed_params': ['q', 'page', 'rpp', 'categories', 'types', 'order_by', 'all_media', 'tags', 'content_type'],
             'contains_blocks': False
         }
     }
@@ -57,10 +57,12 @@ class StoryStreamClient(object):
     def search_published(self, q, **kwargs):
         """
         Search  for published Content Blocks for a Story
-        q -- term to search by - must be 3 characters or more
-        Possible kwargs:
+        q -- term to search by - must be 3 characters or more if specified
+        Possible kwargs
+        categories: comma separated list of categories to filter by tags are not inclusive of each other (OR query)
         tags -- comma separated list of tags to filter by, tags are not inclusive of each other (OR query)
-        types -- comma separated list of feed types to filter by e.g. Youtube, Twitter. Types are not include of each other (OR query)
+        types -- comma separated list of feed types to filter by e.g. Youtube, Twitter. You can also specify "social" for all social media feeds, or "created" for all author created content. Types are not inclusive of each other (OR query)
+        content_type -- comma separated list of content item type to filter by e.g "video", "image", "text". Types are inclusive of each other (OR query)
         all_media -- true/false value will return all associated images & videos or first just associated image/video. (default: false)
         rpp -- number of items to return per page. This is restricted to a maximum of 100 items per page. (default: 20)
         order_by -- property to order items by. Format should be `-FIELDNAME` to search by FIELDNAME in DESCENDING order or `FIELDNAME` for ASCENDING results. (default: -publish_date)
@@ -74,12 +76,13 @@ class StoryStreamClient(object):
         Search approved Content Items for a Story
         q -- term to search by - must be 3 characters or more
         Possible kwargs
-        categories -- comma separated list of categories to filter by.
+        categories: comma separated list of categories to filter by tags are not inclusive of each other (OR query)
         tags -- comma separated list of tags to filter by, tags are not inclusive of each other (OR query)
-        types -- comma separated list of feed types to filter by e.g. Youtube, Twitter. Types are not include of each other (OR query)
+        types -- comma separated list of feed types to filter by e.g. Youtube, Twitter. You can also specify "social" for all social media feeds, or "created" for all author created content. Types are not inclusive of each other (OR query)
+        content_type -- comma separated list of content item type to filter by e.g "video", "image", "text". Types are inclusive of each other (OR query)
         all_media -- true/false value will return all associated images & videos or first just associated image/video. (default: false)
         rpp -- number of items to return per page. This is restricted to a maximum of 100 items per page. (default: 20)
-        order_by -- property to order items by. Format should be `-FIELDNAME` to search by FIELDNAME in DESCENDING order or `FIELDNAME` for ASCENDING results. (default: -id)
+        order_by -- property to order items by. Format should be `-FIELDNAME` to search by FIELDNAME in DESCENDING order or `FIELDNAME` for ASCENDING results. (default: -publish_date)
         """
         endpoint = self.__validate_params(q=q, **kwargs)
         return self.__request(endpoint, q=q, **kwargs)
@@ -89,12 +92,13 @@ class StoryStreamClient(object):
         Search not published Content Items for a Story
         q -- term to search by - must be 3 characters or more
         Possible kwargs
-        categories -- comma separated list of categories to filter by.
+        categories: comma separated list of categories to filter by tags are not inclusive of each other (OR query)
         tags -- comma separated list of tags to filter by, tags are not inclusive of each other (OR query)
-        types -- comma separated list of feed types to filter by e.g. Youtube, Twitter. Types are not include of each other (OR query)
+        types -- comma separated list of feed types to filter by e.g. Youtube, Twitter. You can also specify "social" for all social media feeds, or "created" for all author created content. Types are not inclusive of each other (OR query)
+        content_type -- comma separated list of content item type to filter by e.g "video", "image", "text". Types are inclusive of each other (OR query)
         all_media -- true/false value will return all associated images & videos or first just associated image/video. (default: false)
         rpp -- number of items to return per page. This is restricted to a maximum of 100 items per page. (default: 20)
-        order_by -- property to order items by. Format should be `-FIELDNAME` to search by FIELDNAME in DESCENDING order or `FIELDNAME` for ASCENDING results. (default: -id)
+        order_by -- property to order items by. Format should be `-FIELDNAME` to search by FIELDNAME in DESCENDING order or `FIELDNAME` for ASCENDING results. (default: -publish_date)
         """
         endpoint = self.__validate_params(q=q, **kwargs)
         return self.__request(endpoint, q=q, **kwargs)
